@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chess</title>
+    <link rel="stylesheet" href="css/chessboard-0.3.0.min.css">
+    <link rel="stylesheet" type="text/css" href="../templates/board.css" />
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="js/chessboard-0.3.0.min.js"></script>
+    <script src="chess.js"></script>
+
+
+</head>
+<body>
+
+    <form method="post">
+
+        <fieldset id="box">
+            <legend>Enter player's names</legend>
+
+            <label>White player</label><br>
+            <input type = "text" id = "WhitePlayer" /><br>
+
+            <label>Black player</label><br>
+            <input type = "text" id = "BlackPlayer" />
+
+        </fieldset>
+
+        <p id="player"> </p>
+
+        <div id="buttons">
+            <input type ="button" id="startBtn" value="Start" onclick="Start()" />
+            <input type ="button" id="clearBtn" value="Clear" onclick="Clear()" />
+
+        </div>
+
+        <div id="board"></div>
+
+
+
+    </form>
+    <script>
+            //create chess game
+            var game = new Chess();
+            var player = document.getElementById("player");
+            //hold the current player's name
+            var currentPlayer;
+
+            //proveriti sta  je
+            var removeGreySquares = function () {
+                $('#board .square-55d63').css('background', '');
+            };
+
+            //pogledati i ovo
+            var greySquare = function (square) {
+              var squarePiece = $('#board .square-' + square);
+
+              var background = '#a9a9a9';
+              if(squarePiece.hasClass('black-3c85d') === true){
+                  background = '#696969';
+              }
+
+              squarePiece.css('background', background);
+            };
+
+            //function to check if the move is legal
+            var onDrop = function(source, target) {
+                removeGreySquares();
+
+                //check if the move is legal
+                var move = game.move({
+                    from: source,
+                    to: target,
+                    promotion: 'q' //promote to a queen
+                });
+
+                //if the move is illegal
+                if (move === null){
+                    return 'snapback';
+                }
+              //update the player
+             updatePlayer();
+            };//end of onDrop
+
+            var onMouseoverSquare = function (square, piece) {
+              //get the list of possible moves for this square
+              var moves = game.moves({
+                  square: square,
+                  verbose: true
+              });
+
+              //exit if there are no moves available for this square
+                if (moves.length === 0){
+                    return;
+                }
+
+               //highlight the square the mouse is over
+               greySquare(square);
+
+                //highlight the possible squares for this piece
+                for (var i = 0; i < moves.length; i++){
+                    greySquare(moves[i].to);
+                }
+            };
+
+            var onMouseoutSquare = function (square, piece) {
+              removeGreySquares();
+            };
+
+
+            //get the player's turn
+            //check if there is checkmate
+            //check if it is draw
+            //check if there is check
+            var updatePlayer = function() {
+                //get player's names
+                var whitePlayer = document.getElementById("WhitePlayer").value;
+                var blackPlayer = document.getElementById("BlackPlayer").value;
+
+
+                //holds the current status of the game
+                var status = '';
+
+                //first player is white
+                var currentColor = 'White';
+
+
+                if(game.turn() === 'b'){
+                    currentColor = 'Black';
+                }
+
+                //use player's names instead of colors
+                if (currentColor == "White"){
+                    //if the player's is blank set it's name to white
+                    if(whitePlayer == ''){
+                        currentPlayer = "White";
+                    }
+                    else{
+                        currentPlayer = whitePlayer;
+                    }
+
+                }
+                else if (currentColor == "Black"){
+                    //if the player's is blank set it's name to black
+                    if(blackPlayer == ''){
+                        currentPlayer = "Black";
+                    }
+                    else{
+                        currentPlayer = blackPlayer;
+                    }
+
+                }
+
+                //check if it's checkmate
+                if(game.in_checkmate() === true) {
+                    status = 'Game over ' + currentPlayer + ' is in checkmate.';
+                }
+
+                //check if it's draw
+                else if (game.in_draw() === true){
+                    status = "Game over, drawn position";
+                }
+
+                //keep playing game is still on
+                else {
+                     status = "Turn: " + currentPlayer + "'s turn";
+
+                    //check if it's check
+                    if (game.in_check() === true){
+                        status+= ', ' + currentPlayer + ' is in check';
+                    }
+                }
+
+                player.innerHTML = status;
+            }; //end of updatePlayer
+
+
+            //create the board with the rules
+            var board = ChessBoard ('board', {
+                draggable: true,
+                dropOffBoard: 'trash',
+                sparePieces: true,
+                position: 'start',
+                onDrop: onDrop,
+                onMouseoutSquare: onMouseoutSquare,
+                onMouseoverSquare: onMouseoverSquare
+
+            });
+
+
+            //updatePlayer();
+
+            //reset the game and clean the text boxes
+            function Clear(){
+                game.reset();
+
+                document.getElementById("WhitePlayer").value = "";
+                document.getElementById("BlackPlayer").value = "";
+
+                player.innerHTML = "Resetting the game";
+            }
+
+            //reset the player to white player
+            function Start(){
+                updatePlayer();
+
+            }
+
+            $('#startBtn').on('click', board.start);
+            $('#clearBtn').on('click', board.clear);
+
+    </script>
+
+
+</body>
+</html>
