@@ -46,12 +46,12 @@
             //hold the current player's name
             var currentPlayer;
 
-            //proveriti sta  je
+           
             var removeGreySquares = function () {
                 $('#board .square-55d63').css('background', '');
             };
 
-            //pogledati i ovo
+            
             var greySquare = function (square) {
               var squarePiece = $('#board .square-' + square);
 
@@ -131,7 +131,7 @@
 
                 //use player's names instead of colors
                 if (currentColor == "White"){
-                    //if the player's is blank set it's name to white
+                    //if the player's name is blank set it's name to white
                     if(whitePlayer == ''){
                         currentPlayer = "White";
                     }
@@ -141,7 +141,7 @@
 
                 }
                 else if (currentColor == "Black"){
-                    //if the player's is blank set it's name to black
+                    //if the player's name is blank set it's name to black
                     if(blackPlayer == ''){
                         currentPlayer = "Black";
                     }
@@ -161,7 +161,7 @@
                     status = "Game over, drawn position";
                 }
 
-                //keep playing game is still on
+                //keep playing the game is still on
                 else {
                      status = "Turn: " + currentPlayer + "'s turn";
 
